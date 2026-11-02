@@ -26,16 +26,19 @@ Die Testanleitung liegt unter [docs/TESTANLEITUNG-Etappe1.md](docs/TESTANLEITUNG
 
 ## TURN-Server (optional)
 
-Falls die direkte Verbindung in einem Netz nicht klappt, kann ein TURN-Server in `data/network.json` unter `turnServers` eingetragen werden, z. B. von einem kostenlosen Metered-Konto:
+Falls ein Netz (z. B. Schul-WLAN) direkte Verbindungen blockiert, im Hauptmenü unter **„Netzwerk (TURN-Server)“** die Liste eines TURN-Anbieters einfügen (z. B. von einem kostenlosen Metered-Konto) und speichern. Sie wird nur im eigenen Browser gespeichert, nicht im Repository.
+
+Format (so zeigt es z. B. Metered an):
 
 ```json
-"turnServers": [
-  { "urls": "turn:<server>:80", "username": "<user>", "credential": "<passwort>" }
+[
+  { "urls": "turn:<server>:80", "username": "<user>", "credential": "<passwort>" },
+  { "urls": "turns:<server>:443?transport=tcp", "username": "<user>", "credential": "<passwort>" }
 ]
 ```
 
 Die Verbindung bevorzugt trotzdem immer den direkten Weg; TURN wird nur genutzt, wenn der nicht möglich ist.
-Achtung: Bei einem öffentlichen Repository sind diese Zugangsdaten für alle sichtbar.
+Alternativ können feste Einträge in `data/network.json` unter `turnServers` stehen – bei einem öffentlichen Repository sind sie dann aber für alle sichtbar.
 
 ## Daten
 

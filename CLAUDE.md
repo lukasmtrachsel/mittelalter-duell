@@ -39,7 +39,7 @@ Lizenzen aller Assets in `assets/LICENSES.md` festhalten.
 - **Client-Vorhersage** für die eigene Bewegung, **Interpolation** für die Bewegung des Gegners, damit es trotz Verzögerung flüssig wirkt.
 - **Ping-Anzeige** im Spiel.
 - **Fehlerfall:** Wenn die Verbindung nicht zustande kommt, klare Meldung anzeigen (mögliche Ursache: strenges Netzwerk wie Schul- oder Firmen-WLAN).
-- **TURN-Server nur als Fallback:** Standard ist die direkte Verbindung (STUN). TURN-Server (z. B. kostenloser Metered-Account) dürfen eingetragen werden (`data/network.json`), werden aber nur genutzt, wenn die direkte Verbindung scheitert. Ohne Eintrag läuft alles rein über STUN.
+- **TURN-Server nur als Fallback:** Standard ist die direkte Verbindung (STUN). TURN-Server (z. B. kostenloser Metered-Account) dürfen eingetragen werden, werden aber nur genutzt, wenn die direkte Verbindung scheitert. Ohne Eintrag läuft alles rein über STUN. Eintrag im Hauptmenü unter „Netzwerk (TURN-Server)“, gespeichert nur im `localStorage` (Zugangsdaten nicht ins öffentliche Repository); feste Einträge in `data/network.json` sind zusätzlich möglich. Das Schul-WLAN der Spieler blockiert P2P – dort ist TURN über Port 443 (`turns:…:443?transport=tcp`) nötig.
 - **Fairness / Latenz:** Der Host hat 0 ms Ping. Zum Ausgleich zuerst **großzügiges Parade-Fenster (ca. 200 ms)**. Lag-Kompensation (Zurückspulen beim Host) erst später, falls Tests zeigen, dass es nötig ist.
 
 ### Hosting

@@ -85,3 +85,7 @@ kbd {
   position: absolute; top: 46px; left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 4px;
   background: rgba(140, 42, 31, .85); color: #fff4e0; font-size: 13px; max-width: calc(100% - 32px); text-align: center;
 }
+textarea[data-a=turn] {
+  width: 100%; font-family: Consolas, monospace; font-size: .8rem; padding: 6px; margin: 6px 0;
+  border: 2px solid #5a4630; border-radius: 4px; background: #fffaf0; resize: vertical;
+}

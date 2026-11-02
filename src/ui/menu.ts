@@ -1,6 +1,7 @@
 // Hauptmenü, Warte- und Verbindungsbildschirm.
 import { controls, type Action } from '../core/config';
 import { keyboard } from '../core/input';
+import { loadTurnServers, saveTurnServers } from '../net/turnSettings';
 
 export interface MenuHandlers {
   onHost(local: boolean): void;
@@ -53,6 +54,14 @@ export class MainMenu {
           <button data-a="cancel">Abbrechen</button>
         </section>
         <p class="status" data-a="status" role="status"></p>
+        <details data-a="turnbox">
+          <summary>Netzwerk (TURN-Server) <span data-a="turnstate"></span></summary>
+          <p class="muted">Nur nötig, wenn ein Netz (z. B. Schul-WLAN) direkte Verbindungen blockiert.
+            Die Liste vom TURN-Anbieter (z. B. Metered) hier einfügen. Sie wird nur in diesem Browser gespeichert.
+            Ein TURN-Server wird nur benutzt, wenn die direkte Verbindung nicht klappt.</p>
+          <textarea data-a="turn" rows="5" spellcheck="false" placeholder='[ { "urls": "turns:…:443?transport=tcp", "username": "…", "credential": "…" } ]'></textarea>
+          <div class="row"><button data-a="turnsave">Speichern</button><button data-a="turnclear">Löschen</button></div>
+        </details>
         <details>
           <summary>Steuerung</summary>
           <table class="keys">${ACTION_NAMES.map(([a, n]) =>
@@ -81,6 +90,28 @@ export class MainMenu {
       const code = q('[data-a=codeview]').textContent ?? '';
       navigator.clipboard?.writeText(code).then(() => this.setStatus('Code kopiert.')).catch(() => {});
     });
+    // TURN-Server (nur lokal im Browser gespeichert)
+    const turnArea = q<HTMLTextAreaElement>('[data-a=turn]');
+    const turnState = q('[data-a=turnstate]');
+    const showTurn = (list: RTCIceServer[]) => {
+      turnState.textContent = list.length ? `· ${list.length} eingetragen` : '· keiner';
+      turnArea.value = list.length ? JSON.stringify(list, null, 1) : '';
+    };
+    showTurn(loadTurnServers());
+    q('[data-a=turnsave]').addEventListener('click', () => {
+      try {
+        const list = saveTurnServers(turnArea.value);
+        showTurn(list);
+        this.setStatus(list.length ? `TURN-Server gespeichert (${list.length}).` : 'Keine TURN-Einträge gefunden.', !list.length);
+      } catch (e) {
+        this.setStatus(`TURN-Liste ungültig: ${(e as Error).message}`, true);
+      }
+    });
+    q('[data-a=turnclear]').addEventListener('click', () => {
+      showTurn(saveTurnServers(''));
+      this.setStatus('TURN-Server gelöscht.');
+    });
+
     document.body.append(this.root);
     // Beschriftungen nach Tastaturlayout, sobald verfügbar
     setTimeout(() => this.root.querySelectorAll<HTMLElement>('kbd[data-key]').forEach((k) => {

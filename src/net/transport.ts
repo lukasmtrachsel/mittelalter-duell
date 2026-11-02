@@ -4,6 +4,7 @@
 // Ping, Heartbeat und simulierte Latenz werden hier für alle Modi erledigt.
 import { Peer, type DataConnection } from 'peerjs';
 import { network, simulatedLatency } from '../core/config';
+import { loadTurnServers } from './turnSettings';
 
 /** Rohkanal, über den beliebige JSON-Daten laufen. */
 interface RawChannel {
@@ -132,7 +133,7 @@ const MSG = {
   strictNetwork:
     'Die direkte Verbindung kam nicht zustande. Wahrscheinlich blockiert ein strenges Netzwerk ' +
     '(z. B. Schul- oder Firmen-WLAN) Peer-to-Peer-Verbindungen. Versucht ein anderes Netz ' +
-    '(z. B. Handy-Hotspot) oder tragt einen TURN-Server in data/network.json ein.',
+    '(z. B. Handy-Hotspot) oder tragt im Hauptmenü unter „Netzwerk (TURN-Server)“ einen TURN-Server ein.',
   server:
     'Der PeerJS-Vermittlungsserver ist nicht erreichbar. Bitte Internetverbindung prüfen. ' +
     'Manche Netzwerke (Schul-/Firmen-WLAN) blockieren ihn.',
@@ -142,7 +143,7 @@ const MSG = {
 function iceServers(): RTCIceServer[] {
   // TURN steht mit in der Liste, ICE bevorzugt aber immer direkte Wege (host/STUN).
   // Ein TURN-Relay wird nur gewählt, wenn keine direkte Verbindung möglich ist.
-  return [...network.stunServers, ...network.turnServers];
+  return [...network.stunServers, ...network.turnServers, ...loadTurnServers()];
 }
 
 function peerErrorMessage(type: string, code: string): string {
