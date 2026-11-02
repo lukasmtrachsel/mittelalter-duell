@@ -11,7 +11,7 @@
 
 **Mit künstlicher Verzögerung:** `http://localhost:5173/?lokal=1&lag=80&jitter=20` (+80 ms je Richtung, also ca. 160 ms Ping). So testet ihr die Vorhersage, ohne zweiten Laptop.
 
-> Hinweis: Ein minimiertes Fenster oder ein Tab im Hintergrund pausiert das Spiel (der Browser hält es an). Beim Lokaltest beide Fenster sichtbar nebeneinander stellen.
+> Hinweis: Die Simulation läuft auch weiter, wenn ein Fenster im Hintergrund liegt (nur das Bild wird dort nicht gezeichnet). Am angenehmsten testet man trotzdem mit beiden Fenstern nebeneinander. Kommen beim Gast keine Daten mehr vom Host an, erscheint oben eine rote Warnung.
 
 ## B. Internet-Test (zwei Laptops)
 

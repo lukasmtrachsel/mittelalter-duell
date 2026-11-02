@@ -3,7 +3,8 @@
     "tickRate": 60,
     "snapshotRate": 30,
     "interpolationDelayMs": 100,
-    "maxInputQueue": 4
+    "maxInputQueue": 4,
+    "maxPendingInputs": 240
   },
   "arena": {
     "width": 30,

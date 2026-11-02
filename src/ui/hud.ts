@@ -6,6 +6,7 @@ export class DuelHud {
   private root = document.createElement('div');
   private pingEl = document.createElement('div');
   private debugEl = document.createElement('pre');
+  private warnEl = document.createElement('div');
 
   constructor() {
     this.root.className = 'hud';
@@ -17,11 +18,15 @@ export class DuelHud {
     hint.textContent =
       `${L('moveForward')}${L('moveLeft')}${L('moveBack')}${L('moveRight')} bewegen · ` +
       `${L('sprint')} sprinten · ${L('menu')} Menü · ${L('debug')} Debug`;
-    this.root.append(this.pingEl, this.debugEl, hint);
+    this.warnEl.className = 'hud-warn';
+    this.warnEl.hidden = true;
+    this.root.append(this.pingEl, this.debugEl, this.warnEl, hint);
     document.body.append(this.root);
   }
 
-  update(s: { ping: number; debug: string | null }): void {
+  update(s: { ping: number; warning: string | null; debug: string | null }): void {
+    this.warnEl.hidden = s.warning === null;
+    if (s.warning !== null) this.warnEl.textContent = s.warning;
     const p = Math.round(s.ping);
     this.pingEl.textContent = `Ping ${p} ms`;
     this.pingEl.dataset.q = p < 80 ? 'good' : p < 150 ? 'ok' : 'bad';

@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { balance } from '../../core/config';
 import { keyboard } from '../../core/input';
 import { LockOnCamera } from '../../core/LockOnCamera';
+import { BackgroundTicker } from '../../core/ticker';
 import type { GameMode, ModeContext } from '../../core/mode';
 import { PlaceholderFigure } from '../../character/PlaceholderFigure';
 import { SnapshotBuffer } from '../../net/interpolation';
@@ -45,6 +46,8 @@ class DuelMode implements GameMode {
   private fps = 60;
   private simMs = 0;
   private renderMs = 0;
+  private lastAdvance = performance.now();
+  private ticker: BackgroundTicker;
 
   // Host
   private clientQueue: MoveInput[] = [];
@@ -58,6 +61,7 @@ class DuelMode implements GameMode {
   private correction = { x: 0, z: 0 };
   private lastCorrection = 0;
   private corrections = 0;
+  private lastStateAt = performance.now();
 
   constructor(private ctx: ModeContext) {
     this.me = ctx.role === 'host' ? 0 : 1;
@@ -78,32 +82,49 @@ class DuelMode implements GameMode {
 
     const { width, height } = ctx.renderer.domElement;
     this.resize(width, height);
+
+    // Simulation unabhängig vom Zeichnen takten (läuft auch im Hintergrund weiter)
+    this.ticker = new BackgroundTicker(1000 / balance.simulation.tickRate, () => this.advance());
   }
 
   // -------------------------------------------------------------------------
 
   frame(dt: number): void {
-    const t0 = performance.now();
     this.fps += ((dt > 0 ? 1 / dt : 60) - this.fps) * 0.05;
+    this.advance();
 
-    this.acc += dt;
+    const t1 = performance.now();
+    this.render(dt);
+    this.renderMs += (performance.now() - t1 - this.renderMs) * 0.1;
+
+    let warning: string | null = null;
+    if (this.ctx.role === 'client' && performance.now() - this.lastStateAt > 1000) {
+      warning = 'Keine Daten vom Host – ist sein Fenster minimiert oder hängt die Verbindung?';
+    }
+    this.hud.update({
+      ping: this.ctx.transport.ping,
+      warning,
+      debug: this.debug ? this.debugText() : null,
+    });
+  }
+
+  /**
+   * Simulation bis zur aktuellen Zeit vorrechnen (feste Schritte).
+   * Wird vom Zeichnen UND vom Hintergrund-Takt aufgerufen, damit die Simulation
+   * auch weiterläuft, wenn das Fenster nicht sichtbar ist.
+   */
+  private advance(): void {
+    const now = performance.now();
+    this.acc += Math.min((now - this.lastAdvance) / 1000, 0.5);
+    this.lastAdvance = now;
     let n = 0;
-    while (this.acc >= this.step && n < 10) {
+    while (this.acc >= this.step && n < 30) {
       this.fixedTick();
       this.acc -= this.step;
       n++;
     }
-    if (n === 10) this.acc = 0; // Rückstand verwerfen (z. B. nach Tab-Wechsel)
-    const t1 = performance.now();
-
-    this.render(dt);
-    const t2 = performance.now();
-    this.simMs += (t1 - t0 - this.simMs) * 0.1;
-    this.renderMs += (t2 - t1 - this.renderMs) * 0.1;
-    this.hud.update({
-      ping: this.ctx.transport.ping,
-      debug: this.debug ? this.debugText() : null,
-    });
+    if (n === 30) this.acc = 0; // großen Rückstand verwerfen
+    if (n > 0) this.simMs += (performance.now() - now - this.simMs) * 0.1;
   }
 
   private fixedTick(): void {
@@ -156,6 +177,8 @@ class DuelMode implements GameMode {
     const input = this.readInput(meF, opp.x, opp.z);
     input.seq = ++this.seq;
     this.pending.push(input);
+    // Obergrenze: antwortet der Host nicht, nicht endlos Eingaben sammeln
+    if (this.pending.length > balance.simulation.maxPendingInputs) this.pending.shift();
     this.send({ k: 'input', i: input });
     this.sim.move(meF, input, this.step);
     this.sim.faceEachOther();
@@ -168,6 +191,7 @@ class DuelMode implements GameMode {
         this.clientQueue.push(m.i);
       }
     } else if (m.k === 'state' && this.ctx.role === 'client') {
+      this.lastStateAt = performance.now();
       this.opponentBuf.push(m.ht, m.p[0][0], m.p[0][1]);
       this.reconcile(m.p[1], m.ack);
     }
@@ -302,6 +326,7 @@ class DuelMode implements GameMode {
   }
 
   dispose(): void {
+    this.ticker.stop();
     this.unsubscribe.forEach((u) => u());
     this.ctx.transport.onMessage = () => {};
     this.ctx.transport.onClose = () => {};
