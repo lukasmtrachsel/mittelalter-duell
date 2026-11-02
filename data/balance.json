@@ -1,0 +1,33 @@
+{
+  "simulation": {
+    "tickRate": 60,
+    "snapshotRate": 30,
+    "interpolationDelayMs": 100,
+    "maxInputQueue": 4
+  },
+  "arena": {
+    "width": 30,
+    "depth": 20,
+    "fenceHeight": 1.2,
+    "spawnDistance": 6
+  },
+  "character": {
+    "radius": 0.3,
+    "height": 1.8
+  },
+  "movement": {
+    "walkSpeed": 2.2,
+    "backwardFactor": 0.7,
+    "strafeFactor": 0.85,
+    "sprintSpeed": 5.5,
+    "acceleration": 12,
+    "deceleration": 16
+  },
+  "camera": {
+    "distanceBehind": 3.4,
+    "height": 2.1,
+    "shoulderOffset": 0.6,
+    "fov": 65,
+    "smoothing": 8
+  }
+}

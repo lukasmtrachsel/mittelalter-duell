@@ -1,0 +1,15 @@
+{
+  "_hinweis": "turnServers ist standardmäßig leer. Einträge werden nur genutzt, wenn die direkte Verbindung scheitert (ICE bevorzugt direkte Wege automatisch).",
+  "peerIdPrefix": "mittelalter-duell-",
+  "roomCodeLength": 5,
+  "connectTimeoutMs": 15000,
+  "heartbeatTimeoutMs": 6000,
+  "pingIntervalMs": 1000,
+  "stunServers": [
+    { "urls": "stun:stun.l.google.com:19302" },
+    { "urls": "stun:stun1.l.google.com:19302" }
+  ],
+  "turnServers": [],
+  "simulatedLatencyMs": 0,
+  "simulatedJitterMs": 0
+}

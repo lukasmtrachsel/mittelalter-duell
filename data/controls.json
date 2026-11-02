@@ -1,0 +1,20 @@
+{
+  "_hinweis": "Tasten als KeyboardEvent.code (physische Position, layoutunabhängig). Mehrere Tasten pro Aktion möglich.",
+  "moveForward": ["KeyW"],
+  "moveBack": ["KeyS"],
+  "moveLeft": ["KeyA"],
+  "moveRight": ["KeyD"],
+  "dirUp": ["KeyI"],
+  "dirLeft": ["KeyJ"],
+  "dirDown": ["KeyK"],
+  "dirRight": ["KeyL"],
+  "cut": ["KeyU"],
+  "thrust": ["KeyO"],
+  "block": ["KeyH"],
+  "dodge": ["Space"],
+  "sprint": ["ShiftLeft", "ShiftRight"],
+  "grip": ["KeyQ"],
+  "grapple": ["KeyE"],
+  "menu": ["Escape"],
+  "debug": ["F1"]
+}
